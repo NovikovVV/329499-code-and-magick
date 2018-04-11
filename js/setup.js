@@ -1,10 +1,20 @@
 'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 var setup = document.querySelector('.setup');
+var setupOpen = document.querySelector('.setup-open');
+var setupClose = setup.querySelector('.setup-close');
+var setupUserNameInput = setup.querySelector('.setup-user-name');
+var wizardEyes = document.querySelector('.wizard-eyes');
+var hiddenInputEyesColor = document.querySelector('input[name="eyes-color"]');
+var hiddenInputFireballColor = document.querySelector('input[name="fireball-color"]');
+var fireballWrap = document.querySelector('.setup-fireball-wrap');
 var setupSimilar = document.querySelector('.setup-similar');
 var wizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
 var setupSimilarList = document.querySelector('.setup-similar-list');
 var numberOfSimilarWizards = 4;
+
 var names = [
   'Иван',
   'Хуан Себастьян',
@@ -39,6 +49,14 @@ var eyesColors = [
   'blue',
   'yellow',
   'green'
+];
+
+var fireballColors = [
+  '#ee4830',
+  '#30a8ee',
+  '#5ce6c0',
+  '#e848d5',
+  '#e6e848'
 ];
 
 var getRandomElement = function (array) {
@@ -77,24 +95,88 @@ var createWizards = function (howMany) {
   return wizards;
 };
 
-var renderWizards = function (wizards) {
+var renderWizards = function (wizardsCollection) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < wizards.length; i++) {
+  for (var i = 0; i < wizardsCollection.length; i++) {
     var wizardElement = wizardTemplate.cloneNode(true);
     var wizardName = wizardElement.querySelector('.setup-similar-label');
     var wizardCoatColor = wizardElement.querySelector('.wizard-coat');
     var wizardEyesColor = wizardElement.querySelector('.wizard-eyes');
-    wizardName.textContent = wizards[i].name;
-    wizardCoatColor.style.fill = wizards[i].coatColor;
-    wizardEyesColor.style.fill = wizards[i].eyesColor;
+    wizardName.textContent = wizardsCollection[i].name;
+    wizardCoatColor.style.fill = wizardsCollection[i].coatColor;
+    wizardEyesColor.style.fill = wizardsCollection[i].eyesColor;
     fragment.appendChild(wizardElement);
   }
 
   setupSimilarList.appendChild(fragment);
 };
 
+var openSetup = function () {
+  setup.classList.remove('hidden');
+  setupUserNameInput.addEventListener('focus', onInputFocus);
+  setupUserNameInput.addEventListener('blur', onInputBlur);
+  document.addEventListener('keydown', onSetupEscPress);
+};
+
+var closeSetup = function () {
+  setup.classList.add('hidden');
+  setupUserNameInput.removeEventListener('focus', onInputFocus);
+  setupUserNameInput.removeEventListener('blur', onInputBlur);
+  document.removeEventListener('keydown', onSetupEscPress);
+};
+
+var onInputFocus = function () {
+  document.removeEventListener('keydown', onSetupEscPress);
+};
+
+var onInputBlur = function () {
+  document.addEventListener('keydown', onSetupEscPress);
+};
+
+var onSetupOpenClick = function () {
+  openSetup();
+};
+
+var onSetupOpenEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openSetup();
+  }
+};
+
+var onSetupCloseClick = function () {
+  closeSetup();
+};
+
+var onSetupCloseEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closeSetup();
+  }
+};
+
+var onSetupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeSetup();
+  }
+};
+
+var onWizardEyesClick = function () {
+  wizardEyes.style.fill = getRandomElement(eyesColors);
+  hiddenInputEyesColor.value = wizardEyes.style.fill;
+};
+
+var onFireballClick = function () {
+  var fireballColor = getRandomElement(fireballColors);
+  fireballWrap.style.backgroundColor = fireballColor;
+  hiddenInputFireballColor.value = fireballColor;
+};
+
 var wizards = createWizards(numberOfSimilarWizards);
 renderWizards(wizards);
-setup.classList.remove('hidden');
 setupSimilar.classList.remove('hidden');
+setupOpen.addEventListener('click', onSetupOpenClick);
+setupOpen.addEventListener('keydown', onSetupOpenEnterPress);
+setupClose.addEventListener('click', onSetupCloseClick);
+setupClose.addEventListener('keydown', onSetupCloseEnterPress);
+wizardEyes.addEventListener('click', onWizardEyesClick);
+fireballWrap.addEventListener('click', onFireballClick);

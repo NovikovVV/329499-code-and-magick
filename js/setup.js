@@ -14,6 +14,11 @@ var setupSimilar = document.querySelector('.setup-similar');
 var wizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
 var setupSimilarList = document.querySelector('.setup-similar-list');
 var numberOfSimilarWizards = 4;
+var dialogHandler = document.querySelector('.setup-user-pic');
+var artifactsShop = document.querySelector('.setup-artifacts-shop');
+var artifactsCells = document.querySelectorAll('.setup-artifacts-cell');
+var playerArtifacts = document.querySelector('.setup-artifacts');
+var draggedItem = null;
 
 var names = [
   'Иван',
@@ -50,7 +55,6 @@ var eyesColors = [
   'yellow',
   'green'
 ];
-
 var fireballColors = [
   '#ee4830',
   '#30a8ee',
@@ -124,6 +128,7 @@ var closeSetup = function () {
   setupUserNameInput.removeEventListener('focus', onInputFocus);
   setupUserNameInput.removeEventListener('blur', onInputBlur);
   document.removeEventListener('keydown', onSetupEscPress);
+  setup.style = null;
 };
 
 var onInputFocus = function () {
@@ -171,6 +176,78 @@ var onFireballClick = function () {
   hiddenInputFireballColor.value = fireballColor;
 };
 
+var onDialogHadlerMouseDown = function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (evtMove) {
+    var offset = {
+      x: startCoords.x - evtMove.clientX,
+      y: startCoords.y - evtMove.clientY
+    };
+
+    startCoords.x = evtMove.clientX;
+    startCoords.y = evtMove.clientY;
+
+    setup.style.top = (setup.offsetTop - offset.y) + 'px';
+    setup.style.left = (setup.offsetLeft - offset.x) + 'px';
+  };
+  var onMouseUp = function (evtUp) {
+    evtUp.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+};
+
+var onArtifactsShopDragStart = function (evt) {
+  if (evt.target.tagName.toLowerCase() === 'img') {
+    draggedItem = evt.target;
+    evt.dataTransfer.setData('text/plain', evt.target.alt);
+  }
+};
+
+var enableDragAndDrop = function (array) {
+  for (var i = 0; i < array.length; i++) {
+    var element = array[i];
+    if (element.firstChild && !element.draggble === true) {
+      element.firstChild.draggable = true;
+    }
+  }
+};
+
+var onPlayerArtifactsDrop = function (evt) {
+  if (evt.target.tagName.toLowerCase() === 'div' && !evt.target.firstChild) {
+    evt.target.style.backgroundColor = '';
+    evt.target.appendChild(draggedItem);
+    evt.preventDefault();
+  }
+};
+
+var onPlayerArtifactsDragEnter = function (evt) {
+  evt.target.style = 'outline: 2px dashed red';
+  evt.target.style.backgroundColor = 'yellow';
+  evt.preventDefault();
+};
+
+var onPlayerArtifactsDragLeave = function (evt) {
+  evt.target.style = '';
+  evt.target.style.backgroundColor = '';
+  evt.preventDefault();
+};
+
+var onPlayerArtifactsDragOver = function (evt) {
+  evt.preventDefault();
+  return false;
+};
+
 var wizards = createWizards(numberOfSimilarWizards);
 renderWizards(wizards);
 setupSimilar.classList.remove('hidden');
@@ -180,3 +257,10 @@ setupClose.addEventListener('click', onSetupCloseClick);
 setupClose.addEventListener('keydown', onSetupCloseEnterPress);
 wizardEyes.addEventListener('click', onWizardEyesClick);
 fireballWrap.addEventListener('click', onFireballClick);
+dialogHandler.addEventListener('mousedown', onDialogHadlerMouseDown);
+enableDragAndDrop(artifactsCells);
+artifactsShop.addEventListener('dragstart', onArtifactsShopDragStart);
+playerArtifacts.addEventListener('dragover', onPlayerArtifactsDragOver);
+playerArtifacts.addEventListener('drop', onPlayerArtifactsDrop);
+playerArtifacts.addEventListener('dragenter', onPlayerArtifactsDragEnter);
+playerArtifacts.addEventListener('dragleave', onPlayerArtifactsDragLeave);

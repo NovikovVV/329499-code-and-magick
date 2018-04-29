@@ -3,20 +3,23 @@
   var setupOpen = document.querySelector('.setup-open');
   var setupClose = document.querySelector('.setup-close');
   var setupUserNameInput = document.querySelector('.setup-user-name');
+  var setup = document.querySelector('.setup');
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
 
   var openSetup = function () {
-    window.util.setup.classList.remove('hidden');
+    setup.classList.remove('hidden');
     setupUserNameInput.addEventListener('focus', onInputFocus);
     setupUserNameInput.addEventListener('blur', onInputBlur);
     document.addEventListener('keydown', onSetupEscPress);
   };
 
   var closeSetup = function () {
-    window.util.setup.classList.add('hidden');
+    setup.classList.add('hidden');
     setupUserNameInput.removeEventListener('focus', onInputFocus);
     setupUserNameInput.removeEventListener('blur', onInputBlur);
     document.removeEventListener('keydown', onSetupEscPress);
-    window.util.setup.style = null;
+    setup.style = null;
   };
 
   var onInputFocus = function () {
@@ -32,7 +35,7 @@
   };
 
   var onSetupOpenEnterPress = function (evt) {
-    if (evt.keyCode === window.util.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       openSetup();
     }
   };
@@ -42,13 +45,13 @@
   };
 
   var onSetupCloseEnterPress = function (evt) {
-    if (evt.keyCode === window.util.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       closeSetup();
     }
   };
 
   var onSetupEscPress = function (evt) {
-    if (evt.keyCode === window.util.ESC_KEYCODE) {
+    if (evt.keyCode === ESC_KEYCODE) {
       closeSetup();
     }
   };
